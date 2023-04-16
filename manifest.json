@@ -1,0 +1,38 @@
+{
+  "manifestVersion": "0.1",
+  "version": "1.0.0",
+  "id": "wazo-ring",
+  "packageName": "com.wazo.ring",
+  "developer": {
+    "name": "Wazo",
+    "websiteUrl": "https://wazo.io/",
+    "privacyUrl": "https://wazo.io/privacy",
+    "mpnId": "1234567890"
+  },
+  "name": {
+    "short": "Wazo ring",
+    "full": "Wazo ring integration"
+  },
+  "description": {
+    "short": "Create a ring integration",
+    "full": "create a ring integration"
+  },
+  "icons": {
+    "outline": "",
+    "color": ""
+  },
+  "accentColor": "green",
+  "staticTabs": [
+    {
+      "entityId": "ring",
+      "context": [
+        "innerSettingsTab"
+      ],
+      "position": 101,
+      "name": "Ringtone",
+      "contentUrl": "./index.html",
+      "icon": "./logo.png"
+    }
+  ],
+  "backgroundScript": "./background.js"
+}
