@@ -1,19 +1,25 @@
 <html>
-
+<head>
+  <link href="//cdn.muicss.com/mui-0.10.3/css/mui.min.css" rel="stylesheet" type="text/css" />
+</head>
 <body>
-  <label for="ring">Ring phone:</label>
-  <select name="ring" id="ring">
-    <option value="">Please choose</option>
-    <option value="original">Original</option>
-    <option value="iphone.wav">Iphone</option>
-    <option value="landline1.wav">Landline 1</option>
-    <option value="landline2.wav">Landline 2</option>
-    <option value="marimba.wav">Marimba</option>
-    <option value="ring3.wav">Ring 3</option>
-    <option value="ring4.wav">Ring 4</option>
-    <option value="ring5.wav">Ring 5</option>
-    <option value="dark_side_ringtone.mp3">Stars Wars</option>
-  </select>
+  <legend>Ring Phone</legend>
+  <div class="mui-select">
+    <select id="ring">
+      <option value="">Please choose</option>
+      <option value="original">Original</option>
+      <option value="iphone.wav">Iphone</option>
+      <option value="landline1.wav">Landline 1</option>
+      <option value="landline2.wav">Landline 2</option>
+      <option value="marimba.wav">Marimba</option>
+      <option value="ring3.wav">Ring 3</option>
+      <option value="ring4.wav">Ring 4</option>
+      <option value="ring5.wav">Ring 5</option>
+      <option value="dark_side_ringtone.mp3">Stars Wars</option>
+    </select>
+    <label>Select your ringtone</label>
+  </div>
 </body>
+<script src="//cdn.muicss.com/mui-0.10.3/js/mui.min.js"></script>
 <script src='ring.js' type='module'></script>
 </html>

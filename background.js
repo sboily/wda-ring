@@ -1,7 +1,6 @@
 import app from 'https://cdn.jsdelivr.net/npm/@wazo/euc-plugins-sdk@latest/lib/esm/app.js';
 
-const url = "http://localhost:8900";
-
+let url;
 let count = 0;
 
 const ringStorage = (action, ring) => {
@@ -63,6 +62,9 @@ app.onBackgroundMessage = msg => {
 
 (async () => {
   await app.initialize();
+  const context = app.getContext();
+  url = context.app.extra.baseUrl;
+
   const ring = ringStorage();
   if (ring) {
     setRing(ring);
