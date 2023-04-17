@@ -12,7 +12,7 @@ const options = {
   "ring3.wav": "Ring 3",
   "ring4.wav": "Ring 4",
   "ring5.wav": "Ring 5",
-  "dark_side_ringtone.mp3": "Stars Wars"
+  "dark_side_ringtone.mp3": "Star Wars"
 };
 
 app.onIframeMessage = (msg) => {
