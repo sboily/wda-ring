@@ -22,6 +22,15 @@
     "color": ""
   },
   "accentColor": "green",
+  "localizationInfo": {
+    "defaultLanguageTag": "en",
+    "additionalLanguages": [
+      {
+        "languageTag": "fr",
+        "file": "fr.json"
+      }
+    ]
+  },
   "staticTabs": [
     {
       "entityId": "ring",

@@ -1,0 +1,5 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/teams/v1.5/MicrosoftTeams.Localization.schema.json",
+  "manifestVersion": "0.1",
+  "staticTabs[0].name": "Sonnerie"
+}
