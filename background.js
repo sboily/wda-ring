@@ -1,5 +1,7 @@
 import app from 'https://cdn.jsdelivr.net/npm/@wazo/euc-plugins-sdk@latest/lib/esm/app.js';
 
+const url = "http://localhost:8900";
+
 let count = 0;
 
 const ringStorage = (action, ring) => {
@@ -40,7 +42,7 @@ const handleRing = (msg) => {
       ringStorage("delete")
       break;
     default:
-      const sound = `http://localhost:8900/${ring}`;
+      const sound = `${url}/sounds/${ring}`;
       ringStorage("set", sound);
       setRing(sound);
       playSound();
