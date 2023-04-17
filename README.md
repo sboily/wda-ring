@@ -1,5 +1,7 @@
 # wda-ring
 
+Plugin for WDA to permit the user to change their ringtone for incoming call.
+
 Build
 -----
 
