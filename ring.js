@@ -1,6 +1,8 @@
-import app from 'https://cdn.jsdelivr.net/npm/@wazo/euc-plugins-sdk@latest/lib/esm/app.js';
+import { App } from 'https://cdn.jsdelivr.net/npm/@wazo/euc-plugins-sdk@latest/lib/esm/app.js';
 import i18next from 'https://cdn.jsdelivr.net/gh/i18next/i18next/src/index.js';
 
+
+const app = new App();
 const ringElem = document.getElementById("ring");
 
 const options = {
