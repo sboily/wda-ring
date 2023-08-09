@@ -6,8 +6,7 @@
   "developer": {
     "name": "Wazo",
     "websiteUrl": "https://wazo.io/",
-    "privacyUrl": "https://wazo.io/privacy",
-    "mpnId": "1234567890"
+    "privacyUrl": "https://wazo.io/privacy"
   },
   "name": {
     "short": "Wazo ring",
