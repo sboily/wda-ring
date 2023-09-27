@@ -14,7 +14,13 @@ const options = {
   "ring3.wav": "Ring 3",
   "ring4.wav": "Ring 4",
   "ring5.wav": "Ring 5",
-  "dark_side_ringtone.mp3": "Star Wars"
+  "dark_side_ringtone.mp3": "Star Wars",
+  "bird2.mp3": "Bird",
+  "sf-oiseau-24.mp3": "Bird 1",
+  "oiseau2.mp3": "Bird 2",
+  "sf_oiseau_seul_01.mp3": "Bird 3",
+  "sf_oiseaux.mp3": "Bird 4",
+  "sf_canari.mp3": "Canary"
 };
 
 app.onIframeMessage = (msg) => {
