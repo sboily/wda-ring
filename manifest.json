@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "id": "wazo-ring",
   "packageName": "com.wazo.ring",
+  "productType": "app",
   "developer": {
     "name": "Wazo",
     "websiteUrl": "https://wazo.io/",
