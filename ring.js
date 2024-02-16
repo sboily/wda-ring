@@ -20,7 +20,8 @@ const options = {
   "oiseau2.mp3": "Bird 2",
   "sf_oiseau_seul_01.mp3": "Bird 3",
   "sf_oiseaux.mp3": "Bird 4",
-  "sf_canari.mp3": "Canary"
+  "sf_canari.mp3": "Canary",
+  "zelda_lost_woods.mp3": "Zelda 1"
 };
 
 app.onIframeMessage = (msg) => {
