@@ -7,10 +7,12 @@ const ringElem = document.getElementById("ring");
 
 const options = {
   "original": "Original",
-  "iphone.wav": "Iphone",
+  "iphone.mp3": "Iphone",
+  "iphone6.mp3": "Iphone 6",
   "landline1.wav": "Landline 1",
   "landline2.wav": "Landline 2",
-  "marimba.wav": "Marimba",
+  "marimba.wav": "Marimba 1",
+  "marimba.mp3": "Marimba 2",
   "ring3.wav": "Ring 3",
   "ring4.wav": "Ring 4",
   "ring5.wav": "Ring 5",
@@ -22,6 +24,14 @@ const options = {
   "sf_oiseaux.mp3": "Bird 4",
   "sf_canari.mp3": "Canary",
   "zelda_lost_woods.mp3": "Zelda 1"
+  "hedwigs.mp3": "Harry Potter",
+  "lg_bubble.mp3": "Bubble",
+  "marimba.wav": "Marimba",
+  "stranger_things.mp3": "Stranger Things",
+  "breaking_bad.mp3": "Breaking Bad",
+  "huawei.mp3": "Huawei",
+  "lg_peanut.mp3": "Peanut",
+  "xylo.mp3": "Xylophone"
 };
 
 app.onIframeMessage = (msg) => {
