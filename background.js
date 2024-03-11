@@ -2,7 +2,6 @@ import { App } from 'https://cdn.jsdelivr.net/npm/@wazo/euc-plugins-sdk@0.0.22/l
 
 
 let url;
-let count = 0;
 
 const app = new App();
 
@@ -16,18 +15,6 @@ const ringStorage = (action, ring) => {
       break;
   }
   return localStorage.getItem("ring");
-}
-
-const playSound = () => {
-  count += 1;
-  app.playIncomingCallSound();
-  setTimeout(() => {
-    app.stopCurrentSound();
-
-    if (count < 2) {
-      playSound();
-    }
-  }, 1000);
 }
 
 const setRing = (ring) => {
@@ -47,7 +34,6 @@ const handleRing = (msg) => {
       const sound = `${url}/sounds/${ring}`;
       ringStorage("set", sound);
       setRing(sound);
-      playSound();
   }
 }
 

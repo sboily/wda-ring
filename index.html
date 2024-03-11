@@ -1,12 +1,32 @@
 <html>
 <head>
   <link href="//cdn.muicss.com/mui-0.10.3/css/mui.min.css" rel="stylesheet" type="text/css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+  <style>
+    .mui-select {
+      display: inline-block;
+      vertical-align: middle;
+      width: auto;
+    }
+    .button-container {
+      display: inline-block;
+      vertical-align: middle;
+    }
+    .mui-btn {
+      vertical-align: middle;
+      margin-left: 30px;
+    }
+  </style>
 </head>
 <body style="background-color: initial;">
 <div class="mui-container">
-  <div class="mui-select" style="width:70%;">
+  <div class="mui-select">
     <select id="ring"></select>
     <label id="choose-ring"></label>
+  </div>
+  <div class="button-container">
+    <button id="playButton" class="mui-btn mui-btn--small"><i class="fas fa-play"></i></button>
+    <button id="stopButton" class="mui-btn mui-btn--small"><i class="fas fa-stop"></i></button>
   </div>
 </div>
 </body>
