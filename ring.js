@@ -23,7 +23,7 @@ const options = {
   "sf_oiseau_seul_01.mp3": "Bird 3",
   "sf_oiseaux.mp3": "Bird 4",
   "sf_canari.mp3": "Canary",
-  "zelda_lost_woods.mp3": "Zelda 1"
+  "zelda_lost_woods.mp3": "Zelda 1",
   "hedwigs.mp3": "Harry Potter",
   "lg_bubble.mp3": "Bubble",
   "marimba.wav": "Marimba",
