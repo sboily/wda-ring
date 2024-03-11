@@ -2,11 +2,16 @@ import { App } from 'https://cdn.jsdelivr.net/npm/@wazo/euc-plugins-sdk@0.0.22/l
 import i18next from 'https://cdn.jsdelivr.net/gh/i18next/i18next/src/index.js';
 
 
+let audio;
+let url;
+
 const app = new App();
 const ringElem = document.getElementById("ring");
+const playButton = document.getElementById("playButton");
+const stopButton = document.getElementById("stopButton");
 
 const options = {
-  "original": "Original",
+  "original": "Reset to original",
   "iphone.mp3": "Iphone",
   "iphone6.mp3": "Iphone 6",
   "landline1.wav": "Landline 1",
@@ -52,18 +57,46 @@ const addOptionMenu = (options, idMenu) => {
   }
 }
 
+const listenRingbackTone = (path) => {
+  audio = new Audio(path);
+  audio.play();
+}
+
+const stopListenRingbackTone = () => {
+  if (audio) {
+    audio.pause();
+  }
+}
+
+const addEventsListener = () => {
+  ring.addEventListener("change", function() {
+    const ring = ringElem.value;
+    app.sendMessageToBackground({value: 'ring', data: ring});
+    stopListenRingbackTone();
+  });
+
+  playButton.addEventListener("click", () => {
+    const ring = ringElem.value;
+    const path = `${url}/sounds/${ring}`;
+    stopListenRingbackTone();
+    listenRingbackTone(path);
+  });
+
+  stopButton.addEventListener("click", () => {
+    stopListenRingbackTone();
+  });
+}
+
 (async() => {
   await app.initialize();
   const context = app.getContext();
   const lang = context.app.locale;
+  url = context.app.extra.baseUrl;
 
   addOptionMenu(options, "ring");
+  addEventsListener();
 
   app.sendMessageToBackground({value: 'config'});
-  ring.addEventListener("change", function() {
-    const ring = ringElem.value;
-    app.sendMessageToBackground({value: 'ring', data: ring});
-  });
 
   await i18next.init({
     lng: lang,
