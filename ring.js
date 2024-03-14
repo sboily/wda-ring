@@ -6,9 +6,6 @@ let audio;
 let url;
 
 const app = new App();
-const externalRingElem = document.getElementById("externalRing");
-const playButton = document.getElementById("playButton");
-const stopButton = document.getElementById("stopButton");
 
 const options = {
   "original": "Reset to original",
@@ -42,7 +39,15 @@ const options = {
 app.onIframeMessage = (msg) => {
   if (msg.ring) {
     const ring = msg.ring.split("/").pop();
-    externalRingElem.value = ring;
+    if (msg.type == "external") {
+      const externalRingElem = document.getElementById("externalRing");
+      externalRingElem.value = ring;
+    }
+
+    if (msg.type == "internal") {
+      const internalRingElem = document.getElementById("internalRing");
+      internalRingElem.value = ring;
+    }
   }
 }
 
@@ -71,7 +76,7 @@ const stopListenRingbackTone = () => {
 }
 
 const createInternalCall = () => {
-  const originalDiv = document.getElementById("ringContainer");
+  const originalDiv = document.getElementById("externalRingContainer");
   const clonedDiv = originalDiv.cloneNode(true);
   originalDiv.id = "ringExternalContainer";
   clonedDiv.id = "ringInternalContainer";
@@ -81,24 +86,50 @@ const createInternalCall = () => {
   selectTitle.id = "internalRing";
   const labelTitle = clonedDiv.querySelector("#chooseExternalRing");
   labelTitle.id = "chooseInternalRing";
+  const playButton = clonedDiv.querySelector("#externalPlayButton");
+  playButton.id = "internalPlayButton";
+  const stopButton = clonedDiv.querySelector("#externalStopButton");
+  stopButton.id = "internalStopButton";
   originalDiv.insertAdjacentElement('afterend', clonedDiv);
 }
 
 const addEventsListener = () => {
+  const externalRingElem = document.getElementById("externalRing");
+  const internalRingElem = document.getElementById("internalRing");
+  const externalPlayButton = document.getElementById("externalPlayButton");
+  const externalStopButton = document.getElementById("externalStopButton");
+
   externalRingElem.addEventListener("change", () => {
     const ring = externalRingElem.value;
-    app.sendMessageToBackground({value: 'ring', data: ring});
+    app.sendMessageToBackground({value: 'ring', type: 'external', data: ring});
     stopListenRingbackTone();
   });
 
-  playButton.addEventListener("click", () => {
+  internalRingElem.addEventListener("change", () => {
+    const ring = internalRingElem.value;
+    app.sendMessageToBackground({value: 'ring', type: 'internal', data: ring});
+    stopListenRingbackTone();
+  });
+
+  externalPlayButton.addEventListener("click", () => {
     const ring = externalRingElem.value;
     const path = `${url}/sounds/${ring}`;
     stopListenRingbackTone();
     listenRingbackTone(path);
   });
 
-  stopButton.addEventListener("click", () => {
+  internalPlayButton.addEventListener("click", () => {
+    const ring = internalRingElem.value;
+    const path = `${url}/sounds/${ring}`;
+    stopListenRingbackTone();
+    listenRingbackTone(path);
+  });
+
+  externalStopButton.addEventListener("click", () => {
+    stopListenRingbackTone();
+  });
+
+  internalStopButton.addEventListener("click", () => {
     stopListenRingbackTone();
   });
 }
@@ -113,7 +144,8 @@ const addEventsListener = () => {
   addOptionMenu(options, ["externalRing", "internalRing"]);
   addEventsListener();
 
-  app.sendMessageToBackground({value: 'config'});
+  app.sendMessageToBackground({value: 'config', type: 'external'});
+  app.sendMessageToBackground({value: 'config', type: 'internal'});
 
   await i18next.init({
     lng: lang,

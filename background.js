@@ -5,16 +5,16 @@ let url;
 
 const app = new App();
 
-const ringStorage = (action, ring) => {
+const ringStorage = (action, type, ring) => {
   switch(action) {
     case "set":
-      localStorage.setItem("ring", ring);
+      localStorage.setItem(type, ring);
       break;
     case "delete":
-      localStorage.removeItem("ring");
+      localStorage.removeItem(type);
       break;
   }
-  return localStorage.getItem("ring");
+  return localStorage.getItem(type);
 }
 
 const setRing = (ring) => {
@@ -28,11 +28,11 @@ const handleRing = (msg) => {
   switch(ring) {
     case "original":
       app.resetSounds();
-      ringStorage("delete")
+      ringStorage("delete", msg.type)
       break;
     default:
-      const sound = `${url}/sounds/${ring}`;
-      ringStorage("set", sound);
+      const sound = `${url}sounds/${ring}`;
+      ringStorage("set", msg.type, sound);
       setRing(sound);
   }
 }
@@ -43,10 +43,24 @@ app.onBackgroundMessage = msg => {
       handleRing(msg);
       break;
    case "config":
-     const ring = ringStorage();
-     app.sendMessageToIframe({value: 'config', ring: ring});
+     const ring = ringStorage(null, msg.type);
+     app.sendMessageToIframe({value: 'config', type: msg.type, ring: ring});
      break;
   } 
+}
+
+app.onWebsocketMessage = message => {
+  if (message.name == 'call_created') {
+    if (message.data.direction == 'internal') {
+      const ring = ringStorage(null, 'internal');
+      setRing(ring);
+    }
+
+    if (message.data.direction == 'inbound') {
+      const ring = ringStorage(null, 'external');
+      setRing(ring);
+    }
+  }
 }
 
 (async () => {
@@ -54,7 +68,7 @@ app.onBackgroundMessage = msg => {
   const context = app.getContext();
   url = context.app.extra.baseUrl;
 
-  const ring = ringStorage();
+  const ring = ringStorage(null, "internal");
   if (ring) {
     setRing(ring);
   }
