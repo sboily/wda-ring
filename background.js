@@ -18,6 +18,7 @@ const ringStorage = (action, type, ring) => {
 }
 
 const setRing = (ring) => {
+  app.resetSounds();
   app.configureSounds({
     ring: ring
   });
