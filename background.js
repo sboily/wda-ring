@@ -18,10 +18,20 @@ const ringStorage = (action, type, ring) => {
 }
 
 const setRing = (ring) => {
-  app.resetSounds();
   app.configureSounds({
     ring: ring
   });
+}
+
+const playRingSound = (sound) => {
+  const ring = ringStorage(null, sound);
+  setRing(ring);
+  app.playIncomingCallSound();
+
+  // Let the incoming call sound play before resetting it
+  setTimeout(() => {
+    setRing(null);
+  }, 100);
 }
 
 const handleRing = (msg) => {
@@ -47,19 +57,17 @@ app.onBackgroundMessage = msg => {
      const ring = ringStorage(null, msg.type);
      app.sendMessageToIframe({value: 'config', type: msg.type, ring: ring});
      break;
-  } 
+  }
 }
 
 app.onWebsocketMessage = message => {
   if (message.name == 'call_created') {
     if (message.data.direction == 'internal') {
-      const ring = ringStorage(null, 'internal');
-      setRing(ring);
+      playRingSound('internal');
     }
 
     if (message.data.direction == 'inbound') {
-      const ring = ringStorage(null, 'external');
-      setRing(ring);
+      playRingSound('external');
     }
   }
 }
@@ -69,9 +77,6 @@ app.onWebsocketMessage = message => {
   const context = app.getContext();
   url = context.app.extra.baseUrl;
 
-  const ring = ringStorage(null, "internal");
-  if (ring) {
-    setRing(ring);
-  }
+  setRing(null);
   console.log('ring background - background launched');
 })();
