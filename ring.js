@@ -33,7 +33,8 @@ const ringOptions = {
   "walking_dead.mp3": "Walking Dead",
   "huawei.mp3": "Huawei",
   "lg_peanut.mp3": "Peanut",
-  "xylo.mp3": "Xylophone"
+  "xylo.mp3": "Xylophone",
+  "la_marmotte.mp3": "La marmotte"
 };
 
 // Initialize app and add event listeners

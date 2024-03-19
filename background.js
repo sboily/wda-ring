@@ -26,12 +26,12 @@ const setRing = (ring) => {
 const playRingSound = (sound) => {
   const ring = ringStorage(null, sound);
   setRing(ring);
-  app.playIncomingCallSound();
+  //app.playIncomingCallSound();
 
   // Let the incoming call sound play before resetting it
-  setTimeout(() => {
-    setRing(null);
-  }, 100);
+  //setTimeout(() => {
+  //  setRing(null);
+  //}, 100);
 }
 
 const handleRing = (msg) => {
@@ -58,6 +58,10 @@ app.onBackgroundMessage = msg => {
      app.sendMessageToIframe({value: 'config', type: msg.type, ring: ring});
      break;
   }
+}
+
+app.onCallHungUp = call => {
+  app.stopCurrentSound();
 }
 
 app.onWebsocketMessage = message => {
