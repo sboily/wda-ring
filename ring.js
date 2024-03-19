@@ -1,13 +1,12 @@
+// Imports
 import { App } from 'https://cdn.jsdelivr.net/npm/@wazo/euc-plugins-sdk@0.0.22/lib/esm/app.js';
 import i18next from 'https://cdn.jsdelivr.net/gh/i18next/i18next/src/index.js';
 
-
+// Global variables
 let audio;
-let url;
-
+let appUrl;
 const app = new App();
-
-const options = {
+const ringOptions = {
   "original": "Reset to original",
   "iphone.mp3": "Iphone",
   "iphone6.mp3": "Iphone 6",
@@ -36,6 +35,19 @@ const options = {
   "xylo.mp3": "Xylophone"
 };
 
+// Initialize app and add event listeners
+async function initializeApp() {
+  await app.initialize();
+  const context = app.getContext();
+  appUrl = context.app.extra.baseUrl;
+  setupI18n(context.app.locale);
+  cloneRingContainer();
+  populateRingOptions(["externalRing", "internalRing"]);
+  setupEventListeners();
+  app.sendMessageToBackground({value: 'config', type: 'external'});
+  app.sendMessageToBackground({value: 'config', type: 'internal'});
+}
+
 app.onIframeMessage = (msg) => {
   if (msg.ring) {
     const ring = msg.ring.split("/").pop();
@@ -51,102 +63,8 @@ app.onIframeMessage = (msg) => {
   }
 }
 
-const addOptionMenu = (options, idsMenu) => {
-  idsMenu.forEach((idMenu) => {
-    const menu = document.getElementById(idMenu);
-
-    for (const option in options) {
-       const newOption = document.createElement("option");
-       newOption.text = options[option];
-       newOption.value = option;
-       menu.add(newOption);
-    }
-  });
-}
-
-const listenRingbackTone = (path) => {
-  audio = new Audio(path);
-  audio.play();
-}
-
-const stopListenRingbackTone = () => {
-  if (audio) {
-    audio.pause();
-  }
-}
-
-const createInternalCall = () => {
-  const originalDiv = document.getElementById("externalRingContainer");
-  const clonedDiv = originalDiv.cloneNode(true);
-  originalDiv.id = "ringExternalContainer";
-  clonedDiv.id = "ringInternalContainer";
-  const title = clonedDiv.querySelector("#externalCall");
-  title.id = "internalCall";
-  const selectTitle = clonedDiv.querySelector("#externalRing");
-  selectTitle.id = "internalRing";
-  const labelTitle = clonedDiv.querySelector("#chooseExternalRing");
-  labelTitle.id = "chooseInternalRing";
-  const playButton = clonedDiv.querySelector("#externalPlayButton");
-  playButton.id = "internalPlayButton";
-  const stopButton = clonedDiv.querySelector("#externalStopButton");
-  stopButton.id = "internalStopButton";
-  originalDiv.insertAdjacentElement('afterend', clonedDiv);
-}
-
-const addEventsListener = () => {
-  const externalRingElem = document.getElementById("externalRing");
-  const internalRingElem = document.getElementById("internalRing");
-  const externalPlayButton = document.getElementById("externalPlayButton");
-  const externalStopButton = document.getElementById("externalStopButton");
-
-  externalRingElem.addEventListener("change", () => {
-    const ring = externalRingElem.value;
-    app.sendMessageToBackground({value: 'ring', type: 'external', data: ring});
-    stopListenRingbackTone();
-  });
-
-  internalRingElem.addEventListener("change", () => {
-    const ring = internalRingElem.value;
-    app.sendMessageToBackground({value: 'ring', type: 'internal', data: ring});
-    stopListenRingbackTone();
-  });
-
-  externalPlayButton.addEventListener("click", () => {
-    const ring = externalRingElem.value;
-    const path = `${url}/sounds/${ring}`;
-    stopListenRingbackTone();
-    listenRingbackTone(path);
-  });
-
-  internalPlayButton.addEventListener("click", () => {
-    const ring = internalRingElem.value;
-    const path = `${url}/sounds/${ring}`;
-    stopListenRingbackTone();
-    listenRingbackTone(path);
-  });
-
-  externalStopButton.addEventListener("click", () => {
-    stopListenRingbackTone();
-  });
-
-  internalStopButton.addEventListener("click", () => {
-    stopListenRingbackTone();
-  });
-}
-
-(async() => {
-  await app.initialize();
-  const context = app.getContext();
-  const lang = context.app.locale;
-  url = context.app.extra.baseUrl;
-
-  createInternalCall();
-  addOptionMenu(options, ["externalRing", "internalRing"]);
-  addEventsListener();
-
-  app.sendMessageToBackground({value: 'config', type: 'external'});
-  app.sendMessageToBackground({value: 'config', type: 'internal'});
-
+// Setup i18next for internationalization
+async function setupI18n(lang) {
   await i18next.init({
     lng: lang,
     fallbackLng: 'en',
@@ -170,9 +88,94 @@ const addEventsListener = () => {
       }
     }
   });
+  updateTexts();
+}
 
-  document.getElementById('chooseExternalRing').innerHTML = i18next.t('choose_external_ring');
-  document.getElementById('chooseInternalRing').innerHTML = i18next.t('choose_internal_ring');
-  document.getElementById('externalCall').innerHTML = i18next.t('external_call');
-  document.getElementById('internalCall').innerHTML = i18next.t('internal_call');
-})();
+// Update texts based on current language
+function updateTexts() {
+  document.getElementById('chooseExternalRing').textContent = i18next.t('choose_external_ring');
+  document.getElementById('chooseInternalRing').textContent = i18next.t('choose_internal_ring');
+  document.getElementById('externalCall').textContent = i18next.t('external_call');
+  document.getElementById('internalCall').textContent = i18next.t('internal_call');
+}
+
+// Clone ring container for internal use
+function cloneRingContainer() {
+  const originalDiv = document.getElementById("externalRingContainer");
+  const clonedDiv = originalDiv.cloneNode(true);
+  updateClonedDivIds(clonedDiv);
+  originalDiv.insertAdjacentElement('afterend', clonedDiv);
+}
+
+// Update IDs of cloned elements for uniqueness
+function updateClonedDivIds(clonedDiv) {
+  clonedDiv.id = "ringInternalContainer";
+  clonedDiv.querySelector("#externalCall").id = "internalCall";
+  clonedDiv.querySelector("#externalRing").id = "internalRing";
+  clonedDiv.querySelector("#chooseExternalRing").id = "chooseInternalRing";
+  clonedDiv.querySelector("#externalPlayButton").id = "internalPlayButton";
+  clonedDiv.querySelector("#externalStopButton").id = "internalStopButton";
+}
+
+// Populate ring options in select elements
+function populateRingOptions(ids) {
+  ids.forEach(id => {
+    const selectElement = document.getElementById(id);
+    Object.entries(ringOptions).forEach(([value, text]) => {
+      const option = new Option(text, value);
+      selectElement.add(option);
+    });
+  });
+}
+
+// Setup event listeners for UI interactions
+function setupEventListeners() {
+  document.querySelectorAll("select[id$='Ring']").forEach(select => {
+    select.addEventListener("change", handleRingChange);
+  });
+  document.querySelectorAll("button[id$='PlayButton']").forEach(button => {
+    button.addEventListener("click", playRingbackTone);
+  });
+  document.querySelectorAll("button[id$='StopButton']").forEach(button => {
+    button.addEventListener("click", stopRingbackTone);
+  });
+}
+
+// Handle ring selection change
+function handleRingChange(event) {
+  const { id, value } = event.target;
+  const type = id.includes("external") ? "external" : "internal";
+  app.sendMessageToBackground({ value: 'ring', type, data: value });
+  stopRingbackTone();
+}
+
+// Play selected ringback tone
+function playRingbackTone(event) {
+  stopRingbackTone();
+
+  const buttonId = event.currentTarget.id;
+  const ringElementId = buttonId.replace("PlayButton", "Ring");
+  const ringSelect = document.getElementById(ringElementId);
+
+  if (!ringSelect) {
+    console.error(`No select element found with ID: ${ringElementId}`);
+    return;
+  }
+
+  const ring = ringSelect.value;
+  const path = `${appUrl}/sounds/${ring}`;
+
+  audio = new Audio(path);
+  audio.play().catch(e => console.error("Error playing the audio", e));
+}
+
+// Stop playing the ringback tone
+function stopRingbackTone() {
+  if (audio) {
+    audio.pause();
+    audio = null;
+  }
+}
+
+// Initialize the app
+initializeApp();
