@@ -30,6 +30,7 @@ const ringOptions = {
   "marimba.wav": "Marimba",
   "stranger_things.mp3": "Stranger Things",
   "breaking_bad.mp3": "Breaking Bad",
+  "walking_dead.mp3": "Walking Dead",
   "huawei.mp3": "Huawei",
   "lg_peanut.mp3": "Peanut",
   "xylo.mp3": "Xylophone"
