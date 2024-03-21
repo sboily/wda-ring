@@ -5,16 +5,16 @@ let url;
 
 const app = new App();
 
-const ringStorage = (action, ring) => {
+const ringStorage = (action, type, ring) => {
   switch(action) {
     case "set":
-      localStorage.setItem("ring", ring);
+      localStorage.setItem(type, ring);
       break;
     case "delete":
-      localStorage.removeItem("ring");
+      localStorage.removeItem(type);
       break;
   }
-  return localStorage.getItem("ring");
+  return localStorage.getItem(type);
 }
 
 const setRing = (ring) => {
@@ -23,16 +23,27 @@ const setRing = (ring) => {
   });
 }
 
+const playRingSound = (sound) => {
+  const ring = ringStorage(null, sound);
+  setRing(ring);
+  //app.playIncomingCallSound();
+
+  // Let the incoming call sound play before resetting it
+  //setTimeout(() => {
+  //  setRing(null);
+  //}, 100);
+}
+
 const handleRing = (msg) => {
   const ring = msg.data;
   switch(ring) {
     case "original":
       app.resetSounds();
-      ringStorage("delete")
+      ringStorage("delete", msg.type)
       break;
     default:
-      const sound = `${url}/sounds/${ring}`;
-      ringStorage("set", sound);
+      const sound = `${url}sounds/${ring}`;
+      ringStorage("set", msg.type, sound);
       setRing(sound);
   }
 }
@@ -43,10 +54,26 @@ app.onBackgroundMessage = msg => {
       handleRing(msg);
       break;
    case "config":
-     const ring = ringStorage();
-     app.sendMessageToIframe({value: 'config', ring: ring});
+     const ring = ringStorage(null, msg.type);
+     app.sendMessageToIframe({value: 'config', type: msg.type, ring: ring});
      break;
-  } 
+  }
+}
+
+app.onCallHungUp = call => {
+  app.stopCurrentSound();
+}
+
+app.onWebsocketMessage = message => {
+  if (message.name == 'call_created') {
+    if (message.data.direction == 'internal') {
+      playRingSound('internal');
+    }
+
+    if (message.data.direction == 'inbound') {
+      playRingSound('external');
+    }
+  }
 }
 
 (async () => {
@@ -54,9 +81,6 @@ app.onBackgroundMessage = msg => {
   const context = app.getContext();
   url = context.app.extra.baseUrl;
 
-  const ring = ringStorage();
-  if (ring) {
-    setRing(ring);
-  }
+  setRing(null);
   console.log('ring background - background launched');
 })();
