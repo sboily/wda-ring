@@ -1,4 +1,4 @@
-import { App } from 'https://cdn.jsdelivr.net/npm/@wazo/euc-plugins-sdk@0.0.22/lib/esm/app.js';
+import { App } from 'https://cdn.jsdelivr.net/npm/@wazo/euc-plugins-sdk@0.0.23/lib/esm/app.js';
 
 
 let url;
@@ -66,7 +66,8 @@ app.onCallHungUp = call => {
 }
 
 app.onWebsocketMessage = message => {
-  if (message.name == 'call_created') {
+  // FIXME check line_id in message.data.
+  if (message.name == 'call_created' && message.data.is_caller == false) {
     if (message.data.direction == 'internal') {
       playRingSound('internal');
     }
@@ -81,6 +82,9 @@ app.onWebsocketMessage = message => {
   await app.initialize();
   const context = app.getContext();
   url = context.app.extra.baseUrl;
+
+  const engineVersion = context.user.engineVersion
+  console.log(`Engine Version: ${engineVersion}`);
 
   setRing(null);
   console.log('ring background - background launched');
