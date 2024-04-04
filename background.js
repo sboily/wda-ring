@@ -23,15 +23,16 @@ const setRing = (ring) => {
   });
 }
 
-const playRingSound = (sound) => {
-  const ring = ringStorage(null, sound);
+const playRingSound = (type) => {
+  const ring = ringStorage(null, type);
   setRing(ring);
-  //app.playIncomingCallSound();
+  console.log(ring);
+  app.playIncomingCallSound();
 
   // Let the incoming call sound play before resetting it
-  //setTimeout(() => {
-  //  setRing(null);
-  //}, 100);
+  setTimeout(() => {
+    setRing(null);
+  }, 100);
 }
 
 const handleRing = (msg) => {
