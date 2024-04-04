@@ -2,6 +2,7 @@ import { App } from 'https://cdn.jsdelivr.net/npm/@wazo/euc-plugins-sdk@0.0.23/l
 
 
 let url;
+let main_line;
 
 const app = new App();
 
@@ -26,7 +27,6 @@ const setRing = (ring) => {
 const playRingSound = (type) => {
   const ring = ringStorage(null, type);
   setRing(ring);
-  console.log(ring);
   app.playIncomingCallSound();
 
   // Let the incoming call sound play before resetting it
@@ -45,7 +45,7 @@ const handleRing = (msg) => {
     default:
       const sound = `${url}sounds/${ring}`;
       ringStorage("set", msg.type, sound);
-      setRing(sound);
+      setRing(null);
   }
 }
 
@@ -67,7 +67,7 @@ app.onCallHungUp = call => {
 
 app.onWebsocketMessage = message => {
   // FIXME check line_id in message.data.
-  if (message.name == 'call_created' && message.data.is_caller == false) {
+  if (message.name == 'call_created' && message.data.is_caller == false && message.data.line_id == main_line) {
     if (message.data.direction == 'internal') {
       playRingSound('internal');
     }
@@ -85,6 +85,9 @@ app.onWebsocketMessage = message => {
 
   const engineVersion = context.user.engineVersion
   console.log(`Engine Version: ${engineVersion}`);
+
+  main_line = context.user.profile.lines[0].id;
+  console.log(`Main Line: ${main_line}`);
 
   setRing(null);
   console.log('ring background - background launched');
