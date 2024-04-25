@@ -1,20 +1,21 @@
-import { App } from 'https://cdn.jsdelivr.net/npm/@wazo/euc-plugins-sdk@0.0.22/lib/esm/app.js';
+import { App } from 'https://cdn.jsdelivr.net/npm/@wazo/euc-plugins-sdk@0.0.23/lib/esm/app.js';
 
 
 let url;
+let main_line;
 
 const app = new App();
 
-const ringStorage = (action, ring) => {
+const ringStorage = (action, type, ring) => {
   switch(action) {
     case "set":
-      localStorage.setItem("ring", ring);
+      localStorage.setItem(type, ring);
       break;
     case "delete":
-      localStorage.removeItem("ring");
+      localStorage.removeItem(type);
       break;
   }
-  return localStorage.getItem("ring");
+  return localStorage.getItem(type);
 }
 
 const setRing = (ring) => {
@@ -23,17 +24,28 @@ const setRing = (ring) => {
   });
 }
 
+const playRingSound = (type) => {
+  const ring = ringStorage(null, type);
+  setRing(ring);
+  app.playIncomingCallSound();
+
+  // Let the incoming call sound play before resetting it
+  setTimeout(() => {
+    setRing(null);
+  }, 100);
+}
+
 const handleRing = (msg) => {
   const ring = msg.data;
   switch(ring) {
     case "original":
       app.resetSounds();
-      ringStorage("delete")
+      ringStorage("delete", msg.type)
       break;
     default:
-      const sound = `${url}/sounds/${ring}`;
-      ringStorage("set", sound);
-      setRing(sound);
+      const sound = `${url}sounds/${ring}`;
+      ringStorage("set", msg.type, sound);
+      setRing(null);
   }
 }
 
@@ -43,10 +55,27 @@ app.onBackgroundMessage = msg => {
       handleRing(msg);
       break;
    case "config":
-     const ring = ringStorage();
-     app.sendMessageToIframe({value: 'config', ring: ring});
+     const ring = ringStorage(null, msg.type);
+     app.sendMessageToIframe({value: 'config', type: msg.type, ring: ring});
      break;
-  } 
+  }
+}
+
+app.onCallHungUp = call => {
+  app.stopCurrentSound();
+}
+
+app.onWebsocketMessage = message => {
+  // FIXME check line_id in message.data.
+  if (message.name == 'call_created' && message.data.is_caller == false && message.data.line_id == main_line) {
+    if (message.data.direction == 'internal') {
+      playRingSound('internal');
+    }
+
+    if (message.data.direction == 'inbound') {
+      playRingSound('external');
+    }
+  }
 }
 
 (async () => {
@@ -54,9 +83,12 @@ app.onBackgroundMessage = msg => {
   const context = app.getContext();
   url = context.app.extra.baseUrl;
 
-  const ring = ringStorage();
-  if (ring) {
-    setRing(ring);
-  }
+  const engineVersion = context.user.engineVersion
+  console.log(`Engine Version: ${engineVersion}`);
+
+  main_line = context.user.profile.lines[0].id;
+  console.log(`Main Line: ${main_line}`);
+
+  setRing(null);
   console.log('ring background - background launched');
 })();
