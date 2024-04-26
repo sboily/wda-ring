@@ -3,6 +3,8 @@ import { App } from 'https://cdn.jsdelivr.net/npm/@wazo/euc-plugins-sdk@0.0.23/l
 
 let url;
 let main_line;
+let isRinging;
+let isIncoming;
 
 const app = new App();
 
@@ -18,16 +20,49 @@ const ringStorage = (action, type, ring) => {
   return localStorage.getItem(type);
 }
 
+const isOnCall = () => {
+  return localStorage.getItem("activeCalls");
+}
+
 const setRing = (ring) => {
   app.configureSounds({
     ring: ring
   });
 }
 
+app.onCallIncoming = call => {
+  isIncoming = true;
+  let calls = parseInt(isOnCall) || 0;
+  localStorage.setItem("activeCalls", (++calls).toString());
+
+}
+
+app.onCallAnswered = (call) => {
+  app.stopCurrentSound();
+  isRinging = false;
+  isIncoming = false;
+}
+
+app.onCallHungUp = call => {
+  app.stopCurrentSound();
+  isRinging = false;
+  isIncoming = false;
+  let calls = parseInt(isOnCall) || 0;
+  localStorage.setItem("activeCalls", (--calls).toString());
+}
+
 const playRingSound = (type) => {
   const ring = ringStorage(null, type);
-  setRing(ring);
-  app.playIncomingCallSound();
+  let calls = parseInt(isOnCall) || 0;
+  if (!isRinging && isIncoming && calls < 2) {
+    isRinging = true;
+    setRing(ring);
+    console.log(`Play ringtone sound ${ring}`);
+    if (!ring) {
+      app.resetSounds();
+    }
+    app.playIncomingCallSound();
+  }
 
   // Let the incoming call sound play before resetting it
   setTimeout(() => {
@@ -39,7 +74,6 @@ const handleRing = (msg) => {
   const ring = msg.data;
   switch(ring) {
     case "original":
-      app.resetSounds();
       ringStorage("delete", msg.type)
       break;
     default:
@@ -61,12 +95,9 @@ app.onBackgroundMessage = msg => {
   }
 }
 
-app.onCallHungUp = call => {
-  app.stopCurrentSound();
-}
-
 app.onWebsocketMessage = message => {
-  // FIXME check line_id in message.data.
+  // FIXME check line_id in message.data
+  // FIXME when mobile and WDA are connected, it's not possible to differenciate the line answered
   if (message.name == 'call_created' && message.data.is_caller == false && message.data.line_id == main_line) {
     if (message.data.direction == 'internal') {
       playRingSound('internal');
@@ -87,8 +118,8 @@ app.onWebsocketMessage = message => {
   console.log(`Engine Version: ${engineVersion}`);
 
   main_line = context.user.profile.lines[0].id;
-  console.log(`Main Line: ${main_line}`);
 
   setRing(null);
+  localStorage.setItem("activeCalls", "0");
   console.log('ring background - background launched');
 })();
